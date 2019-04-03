@@ -1,0 +1,48 @@
+- hosts: all
+  become: yes
+  remote_user: root
+  gather_facts: no
+   
+  tasks:
+    
+    - name: 'copy flink configuration file'
+      copy:
+        src: "./{{ flink_yaml }}"
+        dest: "{{ flink_conf_dir }}/flink-conf.yaml"
+        # owner: "{{ user }}"
+        # group: users
+        mode: 0644 
+    
+    - name: 'copy flink masters file'
+      copy:
+        src: "./{{ masters }}"
+        dest: "{{ flink_conf_dir }}/masters"
+        # owner: "{{ user }}"
+        # group: users
+        mode: 0644
+
+    - name: 'copy flink slaves file'
+      copy:
+        src: "./{{ slaves }}"
+        dest: "{{ flink_conf_dir }}/slaves"
+        # owner: "{{ user }}"
+        # group: users
+        mode: 0644
+
+- hosts: jobmanager
+  become: yes
+  remote_user: root
+  gather_facts: no
+
+  tasks:
+    - name: 'starting flink jobmanager'
+      shell: "nohup {{ flink_bin_dir }}/jobmanager.sh start"
+
+- hosts: taskmanager
+  become: yes
+  remote_user: root
+  gather_facts: no
+
+  tasks:
+    - name: 'starting flink taskmanagers'
+      shell: "nohup {{ flink_bin_dir }}/taskmanager.sh start"
